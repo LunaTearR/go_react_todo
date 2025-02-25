@@ -1,1 +1,3 @@
-# go_react_todo
+# Training Project
+# React With Golang
+# TodoList
