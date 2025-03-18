@@ -3,6 +3,7 @@ import { KeyedMutator } from "swr";
 import { Todo } from "./ShowTodo";
 import { createTodo } from "../services/api";
 import { Plus } from "lucide-react";
+import React from "react";
 
 function AddTodo({ mutate }: { mutate: KeyedMutator<Todo[]> }) {
   const [open, setOpen] = useState(false);
@@ -13,19 +14,19 @@ function AddTodo({ mutate }: { mutate: KeyedMutator<Todo[]> }) {
 
   async function handleCreateTodo(e: React.FormEvent) {
     e.preventDefault();
-    
+
     if (title.length < 3) {
       setError("Title must have at least 3 characters");
       return;
     }
-    
+
     try {
       setIsSubmitting(true);
       setError(null);
-      
+
       // Create todo via API service
       await createTodo({ title, body });
-      
+
       // Re-fetch to get the updated list with the new todo
       mutate();
 
@@ -44,11 +45,16 @@ function AddTodo({ mutate }: { mutate: KeyedMutator<Todo[]> }) {
     <div>
       {open ? (
         <div className="bg-white rounded-lg shadow-md p-4">
-          <h2 className="text-lg font-semibold mb-4 text-purple-600">Create New Todo</h2>
-          
+          <h2 className="text-lg font-semibold mb-4 text-purple-600">
+            Create New Todo
+          </h2>
+
           <form onSubmit={handleCreateTodo}>
             <div className="mb-4">
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Title
               </label>
               <input
@@ -61,9 +67,12 @@ function AddTodo({ mutate }: { mutate: KeyedMutator<Todo[]> }) {
                 required
               />
             </div>
-            
+
             <div className="mb-4">
-              <label htmlFor="body" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="body"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Detail (optional)
               </label>
               <textarea
@@ -75,13 +84,13 @@ function AddTodo({ mutate }: { mutate: KeyedMutator<Todo[]> }) {
                 rows={3}
               />
             </div>
-            
+
             {error && (
               <div className="mb-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm">
                 {error}
               </div>
             )}
-            
+
             <div className="flex justify-end space-x-2">
               <button
                 type="button"

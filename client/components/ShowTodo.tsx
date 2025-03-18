@@ -1,8 +1,14 @@
 import { useState } from "react";
 import AddTodo from "./AddTodo";
 import useSWR from "swr";
-import { getTodos, markTodoDone, markTodoUndone, deleteTodo } from "../services/api";
+import {
+  getTodos,
+  markTodoDone,
+  markTodoUndone,
+  deleteTodo,
+} from "../services/api";
 import { CheckCircle, Circle, Trash } from "lucide-react";
+import React from "react";
 
 export interface Todo {
   id: number;
@@ -21,12 +27,10 @@ function ShowTodo() {
   async function handleMarkTodoDone(id: number) {
     try {
       await markTodoDone(id);
-      
+
       // Optimistically update the UI
       mutate(
-        todos.map((todo) => 
-          todo.id === id ? { ...todo, done: true } : todo
-        ),
+        todos.map((todo) => (todo.id === id ? { ...todo, done: true } : todo)),
         false
       );
     } catch (error) {
@@ -37,12 +41,10 @@ function ShowTodo() {
   async function handleMarkTodoUndone(id: number) {
     try {
       await markTodoUndone(id);
-      
+
       // Optimistically update the UI
       mutate(
-        todos.map((todo) => 
-          todo.id === id ? { ...todo, done: false } : todo
-        ),
+        todos.map((todo) => (todo.id === id ? { ...todo, done: false } : todo)),
         false
       );
     } catch (error) {
@@ -54,7 +56,7 @@ function ShowTodo() {
     try {
       setIsDeleting(id);
       await deleteTodo(id);
-      
+
       // Optimistically update the UI
       mutate(
         todos.filter((todo) => todo.id !== id),
@@ -71,16 +73,26 @@ function ShowTodo() {
     <div className="max-w-md mx-auto p-4">
       <ul className="space-y-3 mb-6">
         {todos.length === 0 && (
-          <li className="text-center text-gray-500 py-4">No todos yet. Add one below!</li>
+          <li className="text-center text-gray-500 py-4">
+            No todos yet. Add one below!
+          </li>
         )}
-        
+
         {todos.map((todo) => (
-          <li 
+          <li
             key={`todo__${todo.id}`}
-            className={`bg-white rounded-lg shadow-md p-4 flex items-start ${todo.done ? 'border-l-4 border-green-500' : 'border-l-4 border-purple-500'}`}
+            className={`bg-white rounded-lg shadow-md p-4 flex items-start ${
+              todo.done
+                ? "border-l-4 border-green-500"
+                : "border-l-4 border-purple-500"
+            }`}
           >
             <button
-              onClick={() => todo.done ? handleMarkTodoUndone(todo.id) : handleMarkTodoDone(todo.id)}
+              onClick={() =>
+                todo.done
+                  ? handleMarkTodoUndone(todo.id)
+                  : handleMarkTodoDone(todo.id)
+              }
               className="mt-1 mr-3 flex-shrink-0"
             >
               {todo.done ? (
@@ -89,18 +101,26 @@ function ShowTodo() {
                 <Circle className="h-6 w-6 text-purple-500" />
               )}
             </button>
-            
+
             <div className="flex-grow">
-              <h3 className={`font-medium ${todo.done ? 'text-gray-500 line-through' : 'text-gray-800'}`}>
+              <h3
+                className={`font-medium ${
+                  todo.done ? "text-gray-500 line-through" : "text-gray-800"
+                }`}
+              >
                 {todo.title}
               </h3>
               {todo.body && (
-                <p className={`mt-1 text-sm ${todo.done ? 'text-gray-400 line-through' : 'text-gray-600'}`}>
+                <p
+                  className={`mt-1 text-sm ${
+                    todo.done ? "text-gray-400 line-through" : "text-gray-600"
+                  }`}
+                >
                   {todo.body}
                 </p>
               )}
             </div>
-            
+
             <button
               onClick={() => handleDeleteTodo(todo.id)}
               className="ml-2 flex-shrink-0 text-red-500 hover:text-red-700 transition-colors"
@@ -111,7 +131,7 @@ function ShowTodo() {
           </li>
         ))}
       </ul>
-      
+
       <AddTodo mutate={mutate} />
     </div>
   );
