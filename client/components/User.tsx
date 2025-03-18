@@ -8,7 +8,6 @@ interface User {
   email: string;
 }
 
-
 const UserList = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,6 +17,7 @@ const UserList = () => {
       setLoading(true);
       const data = await getUsers();
       setUsers(data);
+      console.log("data", data)
       setError(null);
     } catch (err) {
       setError("Failed to fetch users");
@@ -55,6 +55,8 @@ const UserList = () => {
         No users yet. Add one above!
       </div>
     );
+  } else {
+    console.log("user",users);
   }
 
   return (

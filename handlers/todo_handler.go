@@ -3,9 +3,9 @@ package handlers
 
 import (
 	"github.com/gofiber/fiber/v3"
-	"github.com/jmoiron/sqlx"
-	"github.com/LunaTearR/go_react_todo/models"
-	"strconv"
+    "github.com/jmoiron/sqlx"
+    "github.com/LunaTearR/go_react_todo/models"
+    "strconv"
 )
 
 // CreateTodoHandler handles creation of a new todo

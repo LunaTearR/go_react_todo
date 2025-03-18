@@ -10,7 +10,6 @@ const api = axios.create({
   },
 });
 
-// Todo API functions
 export const getTodos = async () => {
   const response = await api.get('/api/todos');
   return response.data;

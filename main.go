@@ -6,7 +6,7 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
-	
+
 	"github.com/LunaTearR/go_react_todo/database"
 	"github.com/LunaTearR/go_react_todo/handlers"
 )
@@ -60,7 +60,10 @@ func main() {
 		return handlers.DeleteTodoHandler(c, db)
 	})
 
-	// Setup User routes
+	app.Get("/users", func(c fiber.Ctx) error {
+		return handlers.GetAllUserHandler(c, db)
+	})
+
 	app.Post("/users", func(c fiber.Ctx) error {
 		return handlers.CreateUserHandler(c, db)
 	})

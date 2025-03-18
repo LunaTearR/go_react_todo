@@ -34,3 +34,15 @@ func CreateUserHandler(c fiber.Ctx, db *sqlx.DB) error {
 
 	return c.JSON(user)
 }
+
+func GetAllUserHandler(c fiber.Ctx, db *sqlx.DB) error {
+	user := []models.User{}
+
+	err := db.Select(&user, "SELECT id, username, email FROM users ORDER BY id")
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	return c.JSON(user)
+	
+}
