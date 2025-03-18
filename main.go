@@ -19,8 +19,9 @@ type Todo struct {
 }
 
 type User struct {
-	Name  string `db:"username"`
-	Email string `db:"email"`
+	ID    int    `json:"id" db:"id"`
+	Username  string `json:"username" db:"username"`
+	Email string `json:"email" db:"email"`
 }
 
 func main() {
@@ -56,7 +57,7 @@ func main() {
 			done BOOLEAN DEFAULT FALSE
 		)
 	`)
-	
+
 	if err != nil {
 		log.Println("Error creating todos table:", err)
 	} else {
@@ -71,7 +72,7 @@ func main() {
 			password TEXT NOT NULL
 		)
 	`)
-	
+
 	if err != nil {
 		log.Println("Error creating users table:", err)
 	} else {
@@ -159,6 +160,15 @@ func main() {
 		return c.JSON(todos)
 	})
 
+	app.Get("/users", func(c fiber.Ctx) error {
+		users := []User{}
+		err := db.Select(&users, "SELECT id, email, username FROM users ORDER BY id")
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		}
+		return c.JSON(users)
+	})
+
 	app.Delete("/api/todos/:id/delete", func(c fiber.Ctx) error {
 		idStr := c.Params("id")
 		id, err := strconv.Atoi(idStr)
@@ -177,7 +187,6 @@ func main() {
 			return c.Status(fiber.StatusNotFound).SendString("Todo not found")
 		}
 
-		// Return all remaining todos after deletion
 		todos := []Todo{}
 		err = db.Select(&todos, "SELECT id, title, body, done FROM todos ORDER BY id")
 		if err != nil {
