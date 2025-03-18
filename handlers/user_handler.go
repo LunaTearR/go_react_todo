@@ -1,19 +1,19 @@
+// handlers/user_handler.go
 package handlers
 
 import (
-	"database/sql"
-
 	"github.com/gofiber/fiber/v3"
+	"github.com/jmoiron/sqlx"
 	"github.com/LunaTearR/go_react_todo/models"
 	"github.com/LunaTearR/go_react_todo/utils"
 )
 
 // CreateUserHandler handles user creation
-func CreateUserHandler(c fiber.Ctx, db *sql.DB) error {
-	var user models.User
+func CreateUserHandler(c fiber.Ctx, db *sqlx.DB) error {
+	user := models.User{}
 
 	// Parse JSON request
-	if err := c.BodyParser(&user); err != nil {
+	if err := c.Bind().JSON(&user); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
@@ -25,12 +25,11 @@ func CreateUserHandler(c fiber.Ctx, db *sql.DB) error {
 
 	// Insert user into the database
 	query := `INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id`
-	err = db.QueryRow(query, user.Username, user.Email, hashedPassword).Scan(&user.ID)
+	err = db.QueryRowx(query, user.Username, user.Email, hashedPassword).Scan(&user.ID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	// Don't send password back in response
 	user.Password = ""
 
 	return c.JSON(user)
