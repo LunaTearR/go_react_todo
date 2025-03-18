@@ -3,7 +3,6 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:4000';
 
-// Create axios instance
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -37,7 +36,6 @@ export const deleteTodo = async (id: number) => {
   return response.data;
 };
 
-// User API functions
 export const getUsers = async () => {
   const response = await api.get('/users');
   return response.data;

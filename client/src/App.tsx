@@ -9,6 +9,14 @@ export const ENDPOINT = "http://localhost:4000";
 function App() {
   return (
     <MantineProvider>
+      <nav className="flex justify-between items-center p-4">
+        <Link to="/">
+          <span className="text-2xl font-bold text-purple-600">My Todo List</span>
+        </Link>
+        <Link to="/users">
+          <span className="text-2xl font-bold text-purple-600">Users</span>
+        </Link>
+      </nav>
       <Box
         style={{
           padding: "2rem",
@@ -17,10 +25,6 @@ function App() {
           margin: "0 auto",
         }}
       >
-        <nav>
-          <Link to="/">Home</Link> | <Link to="/users">Users</Link>
-        </nav>
-
         <Routes>
           <Route
             path="/"

@@ -9,6 +9,8 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+
+	"github.com/LunaTearR/go_react_todo/handlers"
 )
 
 type Todo struct {
@@ -16,12 +18,6 @@ type Todo struct {
 	Title string `json:"title"`
 	Done  bool   `json:"done"`
 	Body  string `json:"body"`
-}
-
-type User struct {
-	ID    int    `json:"id" db:"id"`
-	Username  string `json:"username" db:"username"`
-	Email string `json:"email" db:"email"`
 }
 
 func main() {
@@ -77,16 +73,6 @@ func main() {
 		log.Println("Error creating users table:", err)
 	} else {
 		log.Println("Table 'users' created or already exists")
-	}
-
-	place := User{}
-	rows, _ := db.Queryx("SELECT username, email FROM users")
-	for rows.Next() {
-		err := rows.StructScan(&place)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		log.Printf("%#v\n", place)
 	}
 
 	app := fiber.New()
@@ -160,15 +146,6 @@ func main() {
 		return c.JSON(todos)
 	})
 
-	app.Get("/users", func(c fiber.Ctx) error {
-		users := []User{}
-		err := db.Select(&users, "SELECT id, email, username FROM users ORDER BY id")
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
-		}
-		return c.JSON(users)
-	})
-
 	app.Delete("/api/todos/:id/delete", func(c fiber.Ctx) error {
 		idStr := c.Params("id")
 		id, err := strconv.Atoi(idStr)
@@ -195,6 +172,11 @@ func main() {
 
 		return c.JSON(todos)
 	})
+
+	app.Post("/users", func(c fiber.Ctx) error {
+		return handlers.CreateUserHandler(c, db)
+	})
+
 
 	log.Fatal(app.Listen(":4000"))
 }

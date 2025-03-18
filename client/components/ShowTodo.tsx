@@ -69,8 +69,6 @@ function ShowTodo() {
 
   return (
     <div className="max-w-md mx-auto p-4">
-      <h1 className="text-2xl font-bold text-center mb-6 text-purple-600">My Todo List</h1>
-      
       <ul className="space-y-3 mb-6">
         {todos.length === 0 && (
           <li className="text-center text-gray-500 py-4">No todos yet. Add one below!</li>
