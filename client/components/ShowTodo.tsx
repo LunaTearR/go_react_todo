@@ -1,6 +1,7 @@
 import { useState } from "react";
 import AddTodo from "./AddTodo";
 import useSWR from "swr";
+import Swal from "sweetalert2";
 import {
   getTodos,
   markTodoDone,
@@ -53,19 +54,42 @@ function ShowTodo() {
   }
 
   async function handleDeleteTodo(id: number) {
-    try {
-      setIsDeleting(id);
-      await deleteTodo(id);
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to recover this todo!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
+    if (result.isConfirmed) {
+      try {
+        setIsDeleting(id);
 
-      // Optimistically update the UI
-      mutate(
-        todos.filter((todo) => todo.id !== id),
-        false
-      );
-    } catch (error) {
-      console.error("Failed to delete todo:", error);
-    } finally {
-      setIsDeleting(null);
+        Swal.fire({
+          title: "Deleting...",
+          text: "Please wait",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        await deleteTodo(id);
+
+        mutate(
+          todos.filter((todo) => todo.id !== id),
+          false
+        );
+
+        Swal.fire("Deleted!", "Todo has been deleted successfully.", "success");
+      } catch (error) {
+        console.error("Failed to delete todo:", error);
+        Swal.fire("Error!", "Failed to delete the todo.", "error");
+      } finally {
+        setIsDeleting(null);
+      }
     }
   }
 

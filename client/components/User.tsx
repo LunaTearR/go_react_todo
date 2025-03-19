@@ -1,10 +1,13 @@
 // src/components/UserList.jsx
 import { useState, useEffect } from "react";
-import { getUsers } from "../services/api";
+import { deleteUser, getUsers } from "../services/api";
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import ModalAddUser from "./ModalUser";
+import { mutate } from "swr";
+import Swal from "sweetalert2";
+import { Trash } from "lucide-react";
 
 export interface User {
   id: number;
@@ -17,6 +20,8 @@ const UserList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<number | null>(null);
+  const [swalProps, setSwalProps] = useState({});
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -65,6 +70,46 @@ const UserList = () => {
     return users;
   };
 
+  async function handleDeleteUser(id: number) {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to recover this user!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
+    if (result.isConfirmed) {
+      try {
+        setIsDeleting(id);
+
+        Swal.fire({
+          title: "Deleting...",
+          text: "Please wait",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+        await deleteUser(id);
+
+        mutate(
+          users.map((user) => user.id !== id),
+          false
+        );
+
+        Swal.fire("Deleted!", "User has been deleted successfully.", "success");
+      } catch (error) {
+        console.error("Failed to delete user:", error);
+
+        Swal.fire("Error!", "Failed to delete the user.", "error");
+      } finally {
+        fetchUsers();
+        setIsDeleting(null);
+      }
+    }
+  }
   return (
     <>
       <div className="flex justify-end py-2">
@@ -77,8 +122,8 @@ const UserList = () => {
           <span className="p-2">Add user</span>
         </button>
       </div>
-      <ModalAddUser 
-        mutate={mutateUsers} 
+      <ModalAddUser
+        mutate={mutateUsers}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
@@ -118,6 +163,15 @@ const UserList = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {user.email}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <button
+                    onClick={() => handleDeleteUser(user.id)}
+                    className="ml-2 flex-shrink-0 text-red-500 hover:text-red-700 transition-colors"
+                    disabled={isDeleting === user.id}
+                  >
+                    <Trash className="h-5 w-5" />
+                  </button>
                 </td>
               </tr>
             ))}

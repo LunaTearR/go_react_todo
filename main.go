@@ -68,5 +68,9 @@ func main() {
 		return handlers.CreateUserHandler(c, db)
 	})
 
+	app.Delete("/users/:id/delete", func(c fiber.Ctx) error {
+		return handlers.DeleteUserHandler(c, db)
+	})
+
 	log.Fatal(app.Listen(":4000"))
 }

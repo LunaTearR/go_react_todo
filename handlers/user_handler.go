@@ -2,10 +2,12 @@
 package handlers
 
 import (
-	"github.com/gofiber/fiber/v3"
-	"github.com/jmoiron/sqlx"
+	"strconv"
+
 	"github.com/LunaTearR/go_react_todo/models"
 	"github.com/LunaTearR/go_react_todo/utils"
+	"github.com/gofiber/fiber/v3"
+	"github.com/jmoiron/sqlx"
 )
 
 // CreateUserHandler handles user creation
@@ -45,4 +47,26 @@ func GetAllUserHandler(c fiber.Ctx, db *sqlx.DB) error {
 	}
 	return c.JSON(user)
 	
+}
+
+func DeleteUserHandler(c fiber.Ctx, db *sqlx.DB) error {
+	idStr := c.Params("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid ID")
+	}
+
+	query := `DELETE FROM users WHERE id = $1`
+
+	result, err := db.Exec(query, id)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error:": err.Error()})
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return c.Status(fiber.StatusNotFound).SendString("User not found")
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "User deleted successfully"})
 }

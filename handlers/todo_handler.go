@@ -73,7 +73,6 @@ func GetAllTodosHandler(c fiber.Ctx, db *sqlx.DB) error {
 	return c.JSON(todos)
 }
 
-// DeleteTodoHandler deletes a todo
 func DeleteTodoHandler(c fiber.Ctx, db *sqlx.DB) error {
 	idStr := c.Params("id")
 	id, err := strconv.Atoi(idStr)
@@ -92,11 +91,5 @@ func DeleteTodoHandler(c fiber.Ctx, db *sqlx.DB) error {
 		return c.Status(fiber.StatusNotFound).SendString("Todo not found")
 	}
 
-	todos := []models.Todo{}
-	err = db.Select(&todos, "SELECT id, title, body, done FROM todos ORDER BY id")
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
-	}
-
-	return c.JSON(todos)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Todo deleted successfully"})
 }
